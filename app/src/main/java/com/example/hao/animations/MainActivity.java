@@ -1,49 +1,28 @@
 package com.example.hao.animations;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
-import android.content.Intent;
-import android.provider.ContactsContract;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
-import android.transition.TransitionInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button next;
-    private ImageView shareView;
-    private final Activity activity = MainActivity.this;
+    private List<Sample> mSamples;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupWindowAnimations();
-
-        shareView = (ImageView)findViewById(R.id.circle);
-
-        next = (Button) findViewById(R.id.next);
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ActivityB.class);
-                String transitionName = getString(R.string.transition_name);
-
-                final Pair<View, String>[] pairs = TransitionHelper.createSafeTransitionParticipants(activity, false,
-                        new Pair<>(shareView, transitionName));
-
-                ActivityOptionsCompat transitionActivityOption =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(activity, pairs);
-
-                startActivity(intent, transitionActivityOption.toBundle());
-            }
-        });
+        setupSamples();
+        setupToolbar();
+        setupLayout();
 
     }
 
@@ -53,4 +32,30 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setExitTransition(slide);
 
     }
+
+    private void setupSamples() {
+        mSamples = Arrays.asList(
+                new Sample(ContextCompat.getColor(this, R.color.sample_red), "Transitions"),
+                new Sample(ContextCompat.getColor(this, R.color.sample_blue), "Shared Elements"),
+                new Sample(ContextCompat.getColor(this, R.color.sample_green), "View animations"),
+                new Sample(ContextCompat.getColor(this, R.color.sample_yellow), "Circular Reveal Animation")
+        );
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+    }
+
+    private void setupLayout() {
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.sample_list);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        SamplesRecyclerAdapter samplesRecyclerAdapter = new SamplesRecyclerAdapter(this, mSamples);
+        recyclerView.setAdapter(samplesRecyclerAdapter);
+    }
+
+
 }
